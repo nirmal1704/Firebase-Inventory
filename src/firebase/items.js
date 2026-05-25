@@ -9,8 +9,7 @@ import {
   orderBy,
   serverTimestamp,
 } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
-import { db, storage } from './config'
+import { db } from './config'
 
 export function itemsCollectionPath(userId) {
   return `users/${userId}/items`
@@ -34,53 +33,29 @@ export function subscribeToItems(userId, onData, onError) {
   )
 }
 
-export async function createItem(userId, data, imageFile) {
-  let imageUrl = data.imageUrl || ''
+export async function createItem(userId, data) {
   const colRef = collection(db, itemsCollectionPath(userId))
   const docRef = await addDoc(colRef, {
     ...stripForFirestore(data),
-    imageUrl,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
-  if (imageFile) {
-    imageUrl = await uploadItemImage(userId, docRef.id, imageFile)
-    await updateDoc(docRef, { imageUrl, updatedAt: serverTimestamp() })
-  }
   return docRef.id
 }
 
-export async function updateItem(userId, itemId, data, imageFile) {
+export async function updateItem(userId, itemId, data) {
   const docRef = doc(db, itemsCollectionPath(userId), itemId)
-  const payload = { ...stripForFirestore(data), updatedAt: serverTimestamp() }
-  if (imageFile) {
-    payload.imageUrl = await uploadItemImage(userId, itemId, imageFile)
-  }
-  await updateDoc(docRef, payload)
+  await updateDoc(docRef, {
+    ...stripForFirestore(data),
+    updatedAt: serverTimestamp(),
+  })
 }
 
-export async function deleteItem(userId, itemId, imageUrl) {
-  if (imageUrl?.includes('firebasestorage.googleapis.com')) {
-    try {
-      await deleteObject(ref(storage, imageStoragePath(userId, itemId)))
-    } catch {
-      /* image may already be gone */
-    }
-  }
+export async function deleteItem(userId, itemId) {
   await deleteDoc(doc(db, itemsCollectionPath(userId), itemId))
 }
 
-function imageStoragePath(userId, itemId) {
-  return `users/${userId}/items/${itemId}/photo`
-}
-
-async function uploadItemImage(userId, itemId, file) {
-  const storageRef = ref(storage, imageStoragePath(userId, itemId))
-  await uploadBytes(storageRef, file)
-  return getDownloadURL(storageRef)
-}
-
 function stripForFirestore(data) {
-  const { id, createdAt, updatedAt, ...rest } = data
+  const { id, createdAt, updatedAt, imageUrl, ...rest } = data
   return rest
 }

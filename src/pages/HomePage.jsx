@@ -5,6 +5,7 @@ import { SearchFilter } from '../components/SearchFilter'
 import { ItemCard } from '../components/ItemCard'
 import { ItemForm } from '../components/ItemForm'
 import { Modal } from '../components/Modal'
+import { PackAndShipModal } from '../components/PackAndShipModal'
 import { Button } from '../components/ui/Button'
 import { useInventory } from '../hooks/useInventory'
 import { itemToForm } from '../utils/itemDefaults'
@@ -25,6 +26,7 @@ export function HomePage() {
   const [category, setCategory] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [editItemState, setEditItemState] = useState(null)
+  const [shipOpen, setShipOpen] = useState(false)
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -45,20 +47,20 @@ export function HomePage() {
     })
   }, [items, search, category])
 
-  async function handleAdd(data, imageFile) {
-    await addItem(data, imageFile)
+  async function handleAdd(data) {
+    await addItem(data)
     setAddOpen(false)
   }
 
-  async function handleEdit(data, imageFile) {
+  async function handleEdit(data) {
     if (!editItemState) return
-    await editItem(editItemState.id, data, imageFile)
+    await editItem(editItemState.id, data)
     setEditItemState(null)
   }
 
   async function handleDelete(item) {
     if (!window.confirm(`Remove "${item.name}" from your stash?`)) return
-    await removeItem(item.id, item.imageUrl)
+    await removeItem(item.id)
   }
 
   return (
@@ -84,21 +86,30 @@ export function HomePage() {
           </div>
         )}
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <SearchFilter
             search={search}
             onSearchChange={setSearch}
             category={category}
             onCategoryChange={setCategory}
           />
-          <Button
-            variant="lavender"
-            size="lg"
-            className="shrink-0 self-start sm:self-center"
-            onClick={() => setAddOpen(true)}
-          >
-            + Add item
-          </Button>
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <Button
+              variant="lavender"
+              size="lg"
+              onClick={() => setAddOpen(true)}
+            >
+              + Add item
+            </Button>
+            <Button
+              variant="butter"
+              size="lg"
+              disabled={filtered.length === 0}
+              onClick={() => setShipOpen(true)}
+            >
+              All done — pack & ship
+            </Button>
+          </div>
         </div>
 
         {error && (
@@ -152,6 +163,12 @@ export function HomePage() {
           />
         )}
       </Modal>
+
+      <PackAndShipModal
+        open={shipOpen}
+        onClose={() => setShipOpen(false)}
+        items={filtered}
+      />
     </div>
   )
 }

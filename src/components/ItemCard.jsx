@@ -1,4 +1,5 @@
 import { Button } from './ui/Button'
+import { InteractiveBox } from './InteractiveBox'
 
 const categoryColors = {
   Electronics: 'bg-sky/60',
@@ -20,17 +21,18 @@ export function ItemCard({ item, onEdit, onDelete }) {
     <article
       className={`cartoon-border wiggle-hover flex flex-col overflow-hidden rounded-2xl ${categoryColors[item.category] || categoryColors.Other}`}
     >
-      {item.imageUrl ? (
-        <img
-          src={item.imageUrl}
-          alt=""
-          className="h-36 w-full border-b-2 border-ink object-cover"
+      <div className="flex min-h-[140px] items-end justify-center border-b-2 border-ink bg-white/35 px-3 pt-4">
+        <InteractiveBox
+          compact
+          category={item.category}
+          length={item.length}
+          width={item.width}
+          height={item.height}
+          weight={item.weight}
+          weightUnit={item.weightUnit}
+          quantity={item.quantity}
         />
-      ) : (
-        <div className="flex h-28 items-center justify-center border-b-2 border-ink bg-white/40 text-4xl">
-          📦
-        </div>
-      )}
+      </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-start justify-between gap-2">

@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
 import { getAnalytics, isSupported } from 'firebase/analytics'
 
 export const isFirebaseConfigured = Boolean(
@@ -32,7 +31,6 @@ if (isFirebaseConfigured) {
 
 export const auth = app ? getAuth(app) : null
 export const db = app ? getFirestore(app) : null
-export const storage = app ? getStorage(app) : null
 
 export function getAnalyticsIfSupported() {
   if (!app || !import.meta.env.VITE_FIREBASE_MEASUREMENT_ID) return Promise.resolve(null)

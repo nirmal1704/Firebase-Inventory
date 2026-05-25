@@ -110,3 +110,177 @@
     transform: scale(1) translateY(0);
   }
 }
+
+/* —— Interactive 3D boxes —— */
+.interactive-box-3d {
+  transform-style: preserve-3d;
+  transform: rotateX(-18deg) rotateY(28deg);
+}
+
+.box-face {
+  position: absolute;
+  border: 2px solid var(--color-ink);
+  backface-visibility: hidden;
+}
+
+.box-face--front {
+  width: 100%;
+  height: 100%;
+  background: var(--box-front);
+  transform: translateZ(calc(var(--box-depth) / 2));
+}
+
+.box-face--back {
+  width: 100%;
+  height: 100%;
+  background: var(--box-side);
+  transform: rotateY(180deg) translateZ(calc(var(--box-depth) / 2));
+}
+
+.box-face--right {
+  width: var(--box-depth);
+  height: 100%;
+  right: 0;
+  background: var(--box-side);
+  transform-origin: right;
+  transform: rotateY(-90deg) translateZ(calc(var(--box-depth) / 2));
+}
+
+.box-face--left {
+  width: var(--box-depth);
+  height: 100%;
+  left: 0;
+  background: var(--box-side);
+  transform-origin: left;
+  transform: rotateY(90deg) translateZ(calc(var(--box-depth) / 2));
+}
+
+.box-face--top {
+  width: 100%;
+  height: var(--box-depth);
+  top: 0;
+  background: var(--box-top);
+  transform-origin: top;
+  transform: rotateX(-90deg) translateZ(calc(var(--box-depth) / 2));
+}
+
+.box-face--bottom {
+  width: 100%;
+  height: var(--box-depth);
+  bottom: 0;
+  background: var(--box-side);
+  transform-origin: bottom;
+  transform: rotateX(90deg) translateZ(calc(var(--box-depth) / 2));
+}
+
+/* —— Pack & ship scene —— */
+.pack-ship-overlay {
+  background: color-mix(in srgb, var(--color-cream) 88%, transparent);
+}
+
+.pack-ship-backdrop {
+  background: color-mix(in srgb, var(--color-ink) 35%, transparent);
+}
+
+.pack-ship-scene {
+  perspective: 600px;
+}
+
+.pack-ship-box-enter {
+  animation: box-drop-in 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) backwards;
+}
+
+.pack-ship-dock--packed {
+  transform: translate(-50%, 40px) scale(0.3);
+}
+
+.pack-ship-truck--gone {
+  transform: translateX(115vw);
+}
+
+.truck-body {
+  position: relative;
+  width: 200px;
+  height: 72px;
+}
+
+.truck-cab {
+  position: absolute;
+  left: 0;
+  bottom: 14px;
+  width: 56px;
+  height: 44px;
+  background: var(--color-coral);
+  border: 3px solid var(--color-ink);
+  border-radius: 8px 4px 4px 8px;
+  box-shadow: 3px 3px 0 var(--color-ink);
+}
+
+.truck-cab::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  width: 18px;
+  height: 14px;
+  background: color-mix(in srgb, var(--color-sky) 80%, white);
+  border: 2px solid var(--color-ink);
+  border-radius: 4px;
+}
+
+.truck-bed {
+  position: absolute;
+  left: 52px;
+  bottom: 14px;
+  width: 130px;
+  height: 40px;
+  background: var(--color-butter);
+  border: 3px solid var(--color-ink);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 var(--color-ink);
+  transition: height 0.6s ease;
+}
+
+.truck-bed--loaded {
+  height: 48px;
+}
+
+.truck-cargo {
+  min-height: 36px;
+}
+
+.truck-wheel {
+  position: absolute;
+  bottom: 0;
+  width: 22px;
+  height: 22px;
+  background: var(--color-ink);
+  border: 3px solid var(--color-ink);
+  border-radius: 50%;
+  animation: wheel-spin 0.5s linear infinite;
+}
+
+.truck-wheel--back {
+  left: 38px;
+}
+
+.truck-wheel--front {
+  left: 148px;
+}
+
+@keyframes box-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes wheel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

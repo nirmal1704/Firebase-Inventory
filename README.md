@@ -4,12 +4,13 @@ A cartoon-styled, pastel inventory web app built with **React**, **Vite**, **Tai
 
 ## What you can do
 
-- **Add / edit / remove** items with name, description, SKU, category, quantity, weight, dimensions, storage location, and photo
+- **Add / edit / remove** items with name, description, SKU, category, quantity, weight, dimensions, and storage location
+- **Interactive 3D boxes** — size/weight change the box; quantity stacks boxes
+- **Pack & ship** — “All done” plays a packing + truck animation (no Firebase Storage needed)
 - **Real-time sync** — changes appear instantly on every open tab (Firestore `onSnapshot`)
 - **Low-stock alerts** when quantity drops below your minimum
 - **Search & filter** by name, SKU, location, or category
 - **Sign in** with email/password or Google (Firebase Authentication)
-- **Photos** stored in Firebase Storage
 
 ---
 
@@ -49,8 +50,9 @@ Firebase offers two databases:
 |---------|------|
 | **Authentication** | Email/password + Google sign-in; each user sees only their data |
 | **Cloud Firestore** | Stores inventory items under `users/{uid}/items` |
-| **Cloud Storage** | Item photos |
 | **Analytics** | Optional usage stats (if `VITE_FIREBASE_MEASUREMENT_ID` is set) |
+
+**Not required:** Cloud Storage (no photo uploads in this version).
 
 ---
 
@@ -80,11 +82,6 @@ Firebase offers two databases:
 1. **Build → Firestore Database → Create database**
 2. Start in **test mode** for learning, then deploy security rules (step 6)
 3. Choose a region close to you
-
-### 4b. Enable Storage (for photos)
-
-1. **Build → Storage → Get started**
-2. Start in test mode, then deploy storage rules (step 6)
 
 ### 5. Paste keys into `.env` (local)
 
@@ -120,12 +117,11 @@ firebase login
 firebase init
 ```
 
-Select **Firestore** and **Storage**, use existing `firestore.rules` and `storage.rules` in this repo.
+Select **Firestore** only, use existing `firestore.rules` in this repo.
 
 Or paste manually in the console:
 
 - **Firestore → Rules** → contents of `firestore.rules`
-- **Storage → Rules** → contents of `storage.rules`
 
 ### 7. Run locally
 
@@ -180,14 +176,15 @@ After deploy, add your Vercel URL to Firebase **Authentication → Settings → 
 
 ```
 src/
-  firebase/       # App init, Firestore CRUD, Storage uploads
+  firebase/       # App init, Firestore CRUD
+  components/     # InteractiveBox, PackAndShipModal, forms, cards
   contexts/       # Auth state (Firebase Auth)
   hooks/          # useInventory — real-time Firestore listener
   components/     # UI (cards, forms, modals)
   pages/          # Home, Login
   utils/          # Default form values, categories
 firestore.rules   # Only the signed-in user can touch their items
-storage.rules     # Image uploads limited to owner, 5MB, images only
+storage.rules     # Optional — not used by the app anymore
 .env.example      # Template — copy to .env
 ```
 
@@ -195,11 +192,12 @@ storage.rules     # Image uploads limited to owner, 5MB, images only
 
 ## Learn-by-doing: Firebase concepts in this repo
 
-1. **`src/firebase/config.js`** — `initializeApp`, exports `auth`, `db`, `storage`
+1. **`src/firebase/config.js`** — `initializeApp`, exports `auth`, `db`
 2. **`AuthContext.jsx`** — `onAuthStateChanged` keeps login state in sync
 3. **`items.js`** — `onSnapshot` = live query; `addDoc` / `updateDoc` / `deleteDoc` = CRUD
 4. **`firestore.rules`** — server-side enforcement: `request.auth.uid == userId`
-5. **Storage** — `uploadBytes` + `getDownloadURL` for item images
+5. **`InteractiveBox.jsx`** — visual size/stack from dimensions, weight, quantity
+6. **`PackAndShipModal.jsx`** — CSS packing + truck animation (pure frontend)
 
 ---
 

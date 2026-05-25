@@ -26,7 +26,6 @@ export const EMPTY_ITEM = {
   dimensionUnit: 'cm',
   location: '',
   minStock: 5,
-  imageUrl: '',
 }
 
 export function itemToForm(item) {
@@ -46,6 +45,5 @@ export function itemToForm(item) {
     dimensionUnit: item.dimensionUnit ?? 'cm',
     location: item.location ?? '',
     minStock: item.minStock ?? 5,
-    imageUrl: item.imageUrl ?? '',
   }
 }

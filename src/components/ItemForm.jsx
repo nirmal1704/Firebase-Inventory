@@ -2,22 +2,14 @@ import { useState } from 'react'
 import { CATEGORIES, UNITS, WEIGHT_UNITS, EMPTY_ITEM } from '../utils/itemDefaults'
 import { Input, Textarea, Select } from './ui/Input'
 import { Button } from './ui/Button'
+import { InteractiveBox } from './InteractiveBox'
 
 export function ItemForm({ initial = EMPTY_ITEM, onSubmit, onCancel, submitLabel = 'Save item' }) {
   const [form, setForm] = useState(initial)
-  const [imageFile, setImageFile] = useState(null)
-  const [preview, setPreview] = useState(initial.imageUrl || '')
   const [saving, setSaving] = useState(false)
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }))
-  }
-
-  function handleImageChange(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setImageFile(file)
-    setPreview(URL.createObjectURL(file))
   }
 
   async function handleSubmit(e) {
@@ -25,20 +17,17 @@ export function ItemForm({ initial = EMPTY_ITEM, onSubmit, onCancel, submitLabel
     if (!form.name.trim()) return
     setSaving(true)
     try {
-      await onSubmit(
-        {
-          ...form,
-          name: form.name.trim(),
-          description: form.description.trim(),
-          quantity: Number(form.quantity) || 0,
-          minStock: Number(form.minStock) || 0,
-          weight: form.weight ? Number(form.weight) : null,
-          length: form.length ? Number(form.length) : null,
-          width: form.width ? Number(form.width) : null,
-          height: form.height ? Number(form.height) : null,
-        },
-        imageFile,
-      )
+      await onSubmit({
+        ...form,
+        name: form.name.trim(),
+        description: form.description.trim(),
+        quantity: Number(form.quantity) || 0,
+        minStock: Number(form.minStock) || 0,
+        weight: form.weight ? Number(form.weight) : null,
+        length: form.length ? Number(form.length) : null,
+        width: form.width ? Number(form.width) : null,
+        height: form.height ? Number(form.height) : null,
+      })
     } finally {
       setSaving(false)
     }
@@ -46,6 +35,23 @@ export function ItemForm({ initial = EMPTY_ITEM, onSubmit, onCancel, submitLabel
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="cartoon-border rounded-2xl bg-white/60 p-4">
+        <p className="font-hand text-2xl text-ink-soft">Live box preview</p>
+        <p className="mb-2 font-display text-xs text-ink-soft">
+          Grows with size & weight · stacks when quantity goes up
+        </p>
+        <InteractiveBox
+          category={form.category}
+          length={form.length}
+          width={form.width}
+          height={form.height}
+          weight={form.weight}
+          weightUnit={form.weightUnit}
+          quantity={form.quantity}
+          label={form.name.trim() || 'Your item'}
+        />
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
           label="Item name"
@@ -166,23 +172,6 @@ export function ItemForm({ initial = EMPTY_ITEM, onSubmit, onCancel, submitLabel
         onChange={(e) => update('location', e.target.value)}
         placeholder="Shelf A2, garage, etc."
       />
-
-      <label className="block space-y-2">
-        <span className="font-display text-sm font-semibold text-ink">Photo (Firebase Storage)</span>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="block w-full text-sm file:mr-3 file:rounded-lg file:border-2 file:border-ink file:bg-mint file:px-3 file:py-1.5 file:font-display file:text-sm file:font-semibold"
-        />
-        {preview && (
-          <img
-            src={preview}
-            alt="Preview"
-            className="h-24 w-24 rounded-xl border-2 border-ink object-cover"
-          />
-        )}
-      </label>
 
       <div className="flex flex-wrap gap-3 pt-2">
         <Button type="submit" variant="mint" disabled={saving || !form.name.trim()}>

@@ -33,28 +33,28 @@ export function useInventory() {
   }, [user])
 
   const addItem = useCallback(
-    async (data, imageFile) => {
+    async (data) => {
       if (!user) return
       setError(null)
-      await createItem(user.uid, data, imageFile)
+      await createItem(user.uid, data)
     },
     [user],
   )
 
   const editItem = useCallback(
-    async (itemId, data, imageFile) => {
+    async (itemId, data) => {
       if (!user) return
       setError(null)
-      await updateItem(user.uid, itemId, data, imageFile)
+      await updateItem(user.uid, itemId, data)
     },
     [user],
   )
 
   const removeItem = useCallback(
-    async (itemId, imageUrl) => {
+    async (itemId) => {
       if (!user) return
       setError(null)
-      await deleteItem(user.uid, itemId, imageUrl)
+      await deleteItem(user.uid, itemId)
     },
     [user],
   )
